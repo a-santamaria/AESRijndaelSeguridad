@@ -29,7 +29,14 @@ public class RijndaelAES {
 		while(hasNextBlock()){
 			newBlock();
 			printBlock();
+			System.out.println("subBytes");
 			subBytes();
+			printBlock();
+			System.out.println("shiftRows");
+			shiftRows();
+			printBlock();
+			System.out.println("mixcolumns");
+			mixColumns();
 			printBlock();
 		}
 		return null;
@@ -64,7 +71,7 @@ public class RijndaelAES {
 
 	/**
 	 * subBytes 
-	 * subByte, 1st transform of Rijndael
+	 * 1st transformation of Rijndael
 	 */
 	private void subBytes(){
 		int x, y;
@@ -77,6 +84,78 @@ public class RijndaelAES {
 				y = curr & 0x0F; 		//mask: 00001111
 				
 				block[i][j] = Rijndael_Sbox.get(x, y);
+			}
+		}
+	}
+	
+	/**
+	 * shiftRows 
+	 * 2nd transformation of Rijndael
+	 */
+	private void shiftRows(){
+		byte aux;
+		
+		aux = block[1][0];
+		block[1][0] = block[1][1];
+		block[1][1] = block[1][2];
+		block[1][2] = block[1][3];
+		block[1][3] = aux;
+		
+		aux = block[2][0];
+		block[2][0] = block[2][2];
+		block[2][2] = aux;
+		aux = block[2][1];
+		block[2][1] = block[2][3];
+		block[2][3] = aux;
+		
+		aux = block[3][3];
+		block[3][3] = block[3][2];
+		block[3][2] = block[3][1];
+		block[3][1] = block[3][0];
+		block[3][0] = aux;
+				
+		
+	}
+	
+	/**
+	 * MixColumns 
+	 * 3rd transformation of Rijndael
+	 * 
+	 * The array 'a' is simply a copy of the input array 'r'
+     * The array 'b' is each element of the array 'a' multiplied by 2
+     * in Rijndael's Galois field
+     * a[n] ^ b[n] is element n multiplied by 3 in Rijndael's Galois field 
+     * */ 
+	private void mixColumns(){
+		byte[] r = new byte[4];
+		byte[] a = new byte[4];
+		byte[] b = new byte[4];
+	    byte c;
+	    byte h;
+		for(int i = 0 ; i < 4; i++){
+			
+			//get col i of block
+			for(int j = 0; j < 4; j++){
+				r[j] = block[j][i];
+			}			
+			
+		    
+		    for(c=0;c<4;c++) {
+		            a[c] = r[c];
+		            
+		            /* h is 0xff if the high bit of r[c] is set, 0 otherwise */
+		            h = (byte) (r[c] >> 7); 
+		            b[c] = (byte) (r[c] << 1); 
+		            b[c] ^= 0x1B & h; 
+		    }
+		    r[0] = (byte) (b[0] ^ a[3] ^ a[2] ^ b[1] ^ a[1]); // 2 * a0 + a3 + a2 + 3 * a1 
+		    r[1] = (byte) (b[1] ^ a[0] ^ a[3] ^ b[2] ^ a[2]); // 2 * a1 + a0 + a3 + 3 * a2 
+		    r[2] = (byte) (b[2] ^ a[1] ^ a[0] ^ b[3] ^ a[3]); // 2 * a2 + a1 + a0 + 3 * a3 
+		    r[3] = (byte) (b[3] ^ a[2] ^ a[1] ^ b[0] ^ a[0]); // 2 * a3 + a2 + a1 + 3 * a0 
+		    
+		  //fill col i of block with transform
+			for(int j = 0; j < 4; j++){
+				block[j][i] = r[j];
 			}
 		}
 	}
