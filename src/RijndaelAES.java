@@ -1,3 +1,5 @@
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 
 import javax.crypto.KeyGenerator;
@@ -13,6 +15,40 @@ public class RijndaelAES {
 	private SecretKey secretKey;
 	private byte[][] secretKeyBytes;
 	private KeySchedule keySchedule;
+	
+	public RijndaelAES(byte[] textbytes) {
+		super();
+		//this.text = text;
+		
+		generateKey();
+		secretKeyBytes = new byte[4][4];
+		int x = 0;
+		int ii = -1, jj = 0;
+		for(byte b :secretKey.getEncoded()){
+			if((x++) % 4 == 0) {
+				ii++;
+				jj = 0;
+			}
+			secretKeyBytes[ii][jj] = b;
+			jj++;
+		}
+		
+		System.out.println("-----------key------");
+		for(int i = 0 ; i < secretKeyBytes.length; i++){
+			for(int j = 0; j < secretKeyBytes[i].length; j++)
+				System.out.print(toHex(secretKeyBytes[i][j])+" ");
+			System.out.println();
+		}
+		System.out.println("-------------------------");
+		/**this doesn't work (for 0x9A and 0x8D)... don't know why**/
+		//byteText = text.getBytes(); 
+		
+		//convert string to byte array
+		byteText = textbytes;
+		index = 0;
+		block = new byte[4][4];
+		keySchedule = new KeySchedule(secretKeyBytes);
+	}
 	
 	public RijndaelAES(String text) {
 		super();
@@ -65,27 +101,54 @@ public class RijndaelAES {
 	
 	public String encript(){
 		index = 0;
-		if(text.isEmpty()) return null;
+		//if(text.isEmpty()) return null;
 		
+		StringBuilder sb = new StringBuilder();
+		//thread ??
 		while(hasNextBlock()){
 			newBlock();
-			printBlock();
-			System.out.println("subBytes");
-			subBytes();
-			printBlock();
-			System.out.println("shiftRows");
-			shiftRows();
-			printBlock();
-			System.out.println("mixcolumns");
-			mixColumns();
-			printBlock();
-			System.out.println("addRoundKey");
-			addRoundKey();
-			printBlock();
+			encriptBlock();
+			
+			for(int i = 0; i < 4; i++){
+				for(int j = 0; j < 4; j++){
+					sb.append((char)block[i][j]);
+				}
+			}
+			
 		}
-		return null;
+		return sb.toString();
 	}
 	
+	private void encriptBlock() {
+		System.out.println("---------encriptBlock");
+		printBlock();
+		//addRoundKey with initial key
+		addRoundKey(keySchedule.getKey());
+		
+		for(int round = 0; round < 9; round++){
+			//System.out.println("subBytes");
+			subBytes();
+			//printBlock();
+			//System.out.println("shiftRows");
+			shiftRows();
+			//printBlock();
+			//System.out.println("mixcolumns");
+			mixColumns();
+			//printBlock();
+			//System.out.println("addRoundKey");
+			addRoundKey(keySchedule.getNextKey());
+		}
+		
+		subBytes();
+		shiftRows();
+		addRoundKey(keySchedule.getNextKey());
+		
+		
+		printBlock();
+		System.out.println("-------------end EncriptBlock");
+		
+	}
+
 	/**
 	 * newBlock 
 	 * fills block with next bytes in the byte array
@@ -210,9 +273,7 @@ public class RijndaelAES {
 		}
 	}
 	
-	private void addRoundKey(){
-		byte[][] RoundKey = keySchedule.getNextKey();
-		
+	private void addRoundKey(byte[][] RoundKey){		
 		for(int i = 0; i < 4; i++){
 			for(int j = 0; j < 4; j++){
 				block[i][j] ^= RoundKey[i][j];

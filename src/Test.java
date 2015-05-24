@@ -1,3 +1,15 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.CharBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 
 public class Test {
 
@@ -11,34 +23,65 @@ public class Test {
 		};
 		
 		
-		char[] testKey = {
-				0x2b, 0x28, 0xab, 0x09,
-				0x7e, 0xae, 0xf7, 0xcf,
-				0x15, 0xd2, 0x15, 0x4f,
-				0x16, 0xa6, 0x88, 0x3c
-		};
-		
 		/*byte b = (byte) (1 << 7);
 		System.out.println(b & 0xFF);
 		byte h =  (byte) (b >> 7); 
 		System.out.println(h & 0xFF);
 		*/
-		
-		String s = new String(c);
-		
-		System.out.println(s);
-		System.out.println("first");
-		for(int i = 0; i < s.length(); i++){
-			if(i%4 == 0) System.out.println();
-			System.out.print(toHex(s.charAt(i))+" ");
+		/*
+		StringBuilder sb = new StringBuilder();
+		try {
 			
-		}
+			
+			/*BufferedReader br = new BufferedReader(new FileReader("archivo.txt"));
+			String line;
+			while((line = br.readLine()) != null){
+				sb.append(line);
+				sb.append('\n');
+				System.out.println(line);
+			}
+			br.close();
+			System.out.println("acabe");
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+		/*String s = "hola quiero se encriptado";//new String(c);
+		
+		System.out.println(sb.toString());
+		System.out.println("first");
+		for(int i = 0; i < sb.length(); i++){
+			if(i%4 == 0) System.out.println();
+			System.out.print(toHex(sb.charAt(i))+" ");
+			
+		}*/
 		System.out.println("\n");
 		System.out.println("---------AES-------------");
-		RijndaelAES aes = new RijndaelAES(s);
-		aes.encript();
+		//RijndaelAES aes = new RijndaelAES(sb.toString());
 		
 		
+		try {
+			FileReader f = new FileReader("archivo.txt");
+			Path path = Paths.get("archivo.txt");
+			byte[] data = Files.readAllBytes(path);
+			
+			RijndaelAES aes = new RijndaelAES(data);
+			String salida = aes.encript();
+			
+			BufferedWriter bw = new BufferedWriter(new FileWriter("salida.txt"));
+			bw.write(salida);
+			bw.close();
+			
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 
