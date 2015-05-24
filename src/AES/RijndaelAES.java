@@ -55,7 +55,7 @@ public class RijndaelAES {
         int index = 0;
         while (hasNextBlock()) {
             newBlock();
-            encriptBlock();
+            encryptBlock();
 
             for (int i = 0; i < 4; i++) {
                 for (int j = 0; j < 4; j++) {
@@ -72,7 +72,7 @@ public class RijndaelAES {
         return salida;
     }
 
-    private void encriptBlock() {
+    private void encryptBlock() {
         System.out.println("---------encriptBlock");
         printBlock();
         //addRoundKey with initial key
@@ -93,6 +93,51 @@ public class RijndaelAES {
         System.out.println("-------------end EncriptBlock");
 
     }
+    
+    public byte[] decrypt(byte[] encriptedBytes, byte[][] key) {
+        KeySchedule keySchedule = new KeySchedule(key);
+        byte[] salida = new byte[encriptedBytes.length];
+        textbytes = encriptedBytes;
+        //thread ??
+        int index = 0;
+        while (hasNextBlock()) {
+            newBlock();
+            decryptBlock();
+
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    salida[index++] = block[i][j];
+                }
+            }
+
+        }
+        return salida;
+    }
+    
+    
+    private void decryptBlock() {
+        System.out.println("---------decryptBlock");
+        printBlock();
+        //addRoundKey with initial key
+        addRoundKey(keySchedule.getKey());
+
+        for (int round = 0; round < 9; round++) {
+            inverseSubBytes();
+            inverseShiftRows();
+            mixColumns();
+            addRoundKey(keySchedule.getNextKey());
+        }
+
+        subBytes();
+        shiftRows();
+        addRoundKey(keySchedule.getNextKey());
+
+        printBlock();
+        System.out.println("-------------end EncriptBlock");
+
+    }   
+    
+    
 
     /**
      * newBlock fills block with next bytes in the byte array
@@ -145,6 +190,32 @@ public class RijndaelAES {
     }
 
     /**
+     * inversesubBytes 1st transformation of Rijndael
+     * Decrypt
+     */
+    private void inverseSubBytes() {
+
+        byte curr;
+        for (int i = 0; i < 4; i++) {
+            subBytes(block[i]);
+        }
+    }
+
+    private void inverseSubBytes(byte[] arr) {
+        int x, y;
+        byte curr;
+        for (int j = 0; j < 4; j++) {
+            curr = arr[j];
+
+            x = (curr & 0xF0) >> 4; //mask: 11110000
+            y = curr & 0x0F; 		//mask: 00001111
+
+            arr[j] = Rijndael_Sbox.getInverse(x, y);
+        }
+    }
+    
+    
+    /**
      * shiftRows 2nd transformation of Rijndael
      */
     private void shiftRows() {
@@ -170,6 +241,34 @@ public class RijndaelAES {
         block[3][0] = aux;
 
     }
+    
+    
+     /**
+     * InverseShiftRows 2nd transformation of Rijndael
+     * Decrypt
+     */
+    private void inverseShiftRows() {
+        byte aux;
+
+        aux = block[1][3];
+        block[1][3] = block[1][2];
+        block[1][2] = block[1][1];
+        block[1][1] = block[1][0];
+        block[1][0] = aux;
+
+        aux = block[2][0];
+        block[2][0] = block[2][2];
+        block[2][2] = aux;
+        aux = block[2][1];
+        block[2][1] = block[2][3];
+        block[2][3] = aux;
+
+        aux = block[3][0];
+        block[3][0] = block[3][1];
+        block[3][1] = block[3][2];
+        block[3][2] = block[3][3];
+        block[3][3] = aux;
+    }
 
     /**
      * MixColumns 3rd transformation of Rijndael
@@ -189,21 +288,12 @@ public class RijndaelAES {
 
             //get col i of block
             for (int j = 0; j < 4; j++) {
-                r[j] = block[j][i];
+                a[j] = block[j][i];
             }
-
-            for (c = 0; c < 4; c++) {
-                a[c] = r[c];
-
-                /* h is 0xff if the high bit of r[c] is set, 0 otherwise */
-                h = (byte) (r[c] >> 7);
-                b[c] = (byte) (r[c] << 1);
-                b[c] ^= 0x1B & h;
-            }
-            r[0] = (byte) (b[0] ^ a[3] ^ a[2] ^ b[1] ^ a[1]); // 2 * a0 + a3 + a2 + 3 * a1 
-            r[1] = (byte) (b[1] ^ a[0] ^ a[3] ^ b[2] ^ a[2]); // 2 * a1 + a0 + a3 + 3 * a2 
-            r[2] = (byte) (b[2] ^ a[1] ^ a[0] ^ b[3] ^ a[3]); // 2 * a2 + a1 + a0 + 3 * a3 
-            r[3] = (byte) (b[3] ^ a[2] ^ a[1] ^ b[0] ^ a[0]); // 2 * a3 + a2 + a1 + 3 * a0 
+            r[0] = (byte) (GMult.getLookUp2(a[0]) ^ GMult.getLookUp3(a[1]) ^ a[2] ^ a[3]);
+            r[1] = (byte) (a[0] ^ GMult.getLookUp2(a[1]) ^ GMult.getLookUp3(a[2]) ^ a[3]);
+            r[2] = (byte) (a[0] ^ a[1] ^ GMult.getLookUp2(a[2]) ^ GMult.getLookUp3(a[3]));
+            r[3] = (byte) (GMult.getLookUp3(a[0]) ^ a[1] ^ a[2] ^ GMult.getLookUp2(a[3]));
 
             //fill col i of block with transform
             for (int j = 0; j < 4; j++) {

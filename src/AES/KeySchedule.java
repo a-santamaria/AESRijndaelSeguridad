@@ -25,13 +25,13 @@ public class KeySchedule {
 
     public KeySchedule(byte[][] statSecretKey) {
         super();
-        char[][] testKey = {
+        /*char[][] testKey = {
             {0x2b, 0x28, 0xab, 0x09},
             {0x7e, 0xae, 0xf7, 0xcf},
             {0x15, 0xd2, 0x15, 0x4f},
             {0x16, 0xa6, 0x88, 0x3c}
         };
-		//this.secretKey = this.currentKey = statSecretKey;
+        
 
         this.currentKey = new byte[4][4];
         for (int i = 0; i < 4; i++) {
@@ -40,11 +40,19 @@ public class KeySchedule {
             }
         }
         secretKey = currentKey;
+        */
+        
+        this.secretKey = this.currentKey = statSecretKey;
         round = 0;
     }
 
     public byte[][] getKey() {
         return secretKey;
+    }
+    
+    public void setKey(byte[][] key) {
+        secretKey = key;
+        currentKey = key;
     }
 
     public byte[][] getNextKey() {
