@@ -1,3 +1,8 @@
+import java.security.NoSuchAlgorithmException;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+
 
 public class KeySchedule {
 	private byte[][] secretKey;
@@ -106,6 +111,33 @@ public class KeySchedule {
 			}
 		}
 	}
+	
+	
+	public static byte[][] generateKey(){
+		KeyGenerator keyGen = null;
+		try {
+			keyGen = KeyGenerator.getInstance("AES");
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		keyGen.init(128);
+		SecretKey secretK = keyGen.generateKey();
+		byte[][] secretKeyBytes = new byte[4][4];
+		int x = 0;
+		int ii = -1, jj = 0;
+		for(byte b :secretK.getEncoded()){
+			if((x++) % 4 == 0) {
+				ii++;
+				jj = 0;
+			}
+			secretKeyBytes[ii][jj] = b;
+			jj++;
+		}
+		
+		return secretKeyBytes;
+	}
+		
 	
 	private void printRow(byte[] arr){
 		for(int j = 0; j < 4; j++){

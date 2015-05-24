@@ -9,83 +9,23 @@ import javax.crypto.SecretKey;
 public class RijndaelAES {
 	
 	private String text;
-	private byte[] byteText;
 	private byte[][] block;
 	private int index;
 	private SecretKey secretKey;
 	private byte[][] secretKeyBytes;
 	private KeySchedule keySchedule;
+	byte[] textbytes;
 	
-	public RijndaelAES(byte[] textbytes) {
+	public RijndaelAES(byte[] textbytes, byte[][] secretKeybytes) {
 		super();
-		//this.text = text;
 		
-		generateKey();
-		secretKeyBytes = new byte[4][4];
-		int x = 0;
-		int ii = -1, jj = 0;
-		for(byte b :secretKey.getEncoded()){
-			if((x++) % 4 == 0) {
-				ii++;
-				jj = 0;
-			}
-			secretKeyBytes[ii][jj] = b;
-			jj++;
-		}
-		
-		System.out.println("-----------key------");
-		for(int i = 0 ; i < secretKeyBytes.length; i++){
-			for(int j = 0; j < secretKeyBytes[i].length; j++)
-				System.out.print(toHex(secretKeyBytes[i][j])+" ");
-			System.out.println();
-		}
-		System.out.println("-------------------------");
-		/**this doesn't work (for 0x9A and 0x8D)... don't know why**/
-		//byteText = text.getBytes(); 
-		
-		//convert string to byte array
-		byteText = textbytes;
+		this.textbytes = textbytes;
+		this.secretKeyBytes = secretKeybytes;
 		index = 0;
 		block = new byte[4][4];
 		keySchedule = new KeySchedule(secretKeyBytes);
 	}
 	
-	public RijndaelAES(String text) {
-		super();
-		this.text = text;
-		
-		generateKey();
-		secretKeyBytes = new byte[4][4];
-		int x = 0;
-		int ii = -1, jj = 0;
-		for(byte b :secretKey.getEncoded()){
-			if((x++) % 4 == 0) {
-				ii++;
-				jj = 0;
-			}
-			secretKeyBytes[ii][jj] = b;
-			jj++;
-		}
-		
-		System.out.println("-----------key------");
-		for(int i = 0 ; i < secretKeyBytes.length; i++){
-			for(int j = 0; j < secretKeyBytes[i].length; j++)
-				System.out.print(toHex(secretKeyBytes[i][j])+" ");
-			System.out.println();
-		}
-		System.out.println("-------------------------");
-		/**this doesn't work (for 0x9A and 0x8D)... don't know why**/
-		//byteText = text.getBytes(); 
-		
-		//convert string to byte array
-		byteText = new byte[text.length()];
-		for(int i = 0 ; i < text.length(); i++){
-			byteText[i] = (byte) text.charAt(i);
-		}
-		index = 0;
-		block = new byte[4][4];
-		keySchedule = new KeySchedule(secretKeyBytes);
-	}
 	
 	private void generateKey(){
 		KeyGenerator keyGen = null;
@@ -99,12 +39,19 @@ public class RijndaelAES {
 		secretKey = keyGen.generateKey();
 	}
 	
-	public String encript(){
+	public byte[] encrypt(){
 		index = 0;
-		//if(text.isEmpty()) return null;
+		if(textbytes.length == 0) return null;
 		
 		StringBuilder sb = new StringBuilder();
+		
+		int num = (textbytes.length/16);
+		if(textbytes.length % 16 != 0) num+=1;
+		byte[] salida = new byte[16*(num)];
+		
+		
 		//thread ??
+		int index = 0;
 		while(hasNextBlock()){
 			newBlock();
 			encriptBlock();
@@ -112,11 +59,16 @@ public class RijndaelAES {
 			for(int i = 0; i < 4; i++){
 				for(int j = 0; j < 4; j++){
 					sb.append((char)block[i][j]);
+					salida[index++] = block[i][j];
 				}
 			}
 			
 		}
-		return sb.toString();
+		/*System.out.println("------------------salida");
+		for(byte b : salida){
+			System.out.println(toHex(b));
+		}*/
+		return salida;
 	}
 	
 	private void encriptBlock() {
@@ -126,16 +78,9 @@ public class RijndaelAES {
 		addRoundKey(keySchedule.getKey());
 		
 		for(int round = 0; round < 9; round++){
-			//System.out.println("subBytes");
 			subBytes();
-			//printBlock();
-			//System.out.println("shiftRows");
 			shiftRows();
-			//printBlock();
-			//System.out.println("mixcolumns");
 			mixColumns();
-			//printBlock();
-			//System.out.println("addRoundKey");
 			addRoundKey(keySchedule.getNextKey());
 		}
 		
@@ -156,8 +101,8 @@ public class RijndaelAES {
 	private void newBlock(){
 		for(int i = 0; i < 4; i++){
 			for(int j = 0; j < 4; j++){
-				if(index < byteText.length)
-					block[i][j] = (byteText[index++]);
+				if(index < textbytes.length)
+					block[i][j] = (textbytes[index++]);
 				else
 					block[i][j] = 0;
 			}
@@ -170,7 +115,7 @@ public class RijndaelAES {
 	 * for a new block
 	 */
 	private boolean hasNextBlock(){
-		if(index >= byteText.length)
+		if(index >= textbytes.length)
 			return false;
 		else 
 			return true;
