@@ -1,3 +1,8 @@
+import java.security.NoSuchAlgorithmException;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+
 
 public class RijndaelAES {
 	
@@ -5,11 +10,34 @@ public class RijndaelAES {
 	private byte[] byteText;
 	private byte[][] block;
 	private int index;
+	private SecretKey secretKey;
+	private byte[][] secretKeyBytes;
+	private KeySchedule keySchedule;
 	
 	public RijndaelAES(String text) {
 		super();
 		this.text = text;
 		
+		generateKey();
+		secretKeyBytes = new byte[4][4];
+		int x = 0;
+		int ii = -1, jj = 0;
+		for(byte b :secretKey.getEncoded()){
+			if((x++) % 4 == 0) {
+				ii++;
+				jj = 0;
+			}
+			secretKeyBytes[ii][jj] = b;
+			jj++;
+		}
+		
+		System.out.println("-----------key------");
+		for(int i = 0 ; i < secretKeyBytes.length; i++){
+			for(int j = 0; j < secretKeyBytes[i].length; j++)
+				System.out.print(toHex(secretKeyBytes[i][j])+" ");
+			System.out.println();
+		}
+		System.out.println("-------------------------");
 		/**this doesn't work (for 0x9A and 0x8D)... don't know why**/
 		//byteText = text.getBytes(); 
 		
@@ -20,6 +48,19 @@ public class RijndaelAES {
 		}
 		index = 0;
 		block = new byte[4][4];
+		keySchedule = new KeySchedule(secretKeyBytes);
+	}
+	
+	private void generateKey(){
+		KeyGenerator keyGen = null;
+		try {
+			keyGen = KeyGenerator.getInstance("AES");
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		keyGen.init(128);
+		secretKey = keyGen.generateKey();
 	}
 	
 	public String encript(){
@@ -37,6 +78,9 @@ public class RijndaelAES {
 			printBlock();
 			System.out.println("mixcolumns");
 			mixColumns();
+			printBlock();
+			System.out.println("addRoundKey");
+			addRoundKey();
 			printBlock();
 		}
 		return null;
@@ -74,17 +118,23 @@ public class RijndaelAES {
 	 * 1st transformation of Rijndael
 	 */
 	private void subBytes(){
-		int x, y;
+		
 		byte curr;  
 		for(int i = 0; i < 4; i++){
-			for(int j = 0; j < 4; j++){
-				curr = block[i][j];
-				
-				x = (curr & 0xF0) >> 4; //mask: 11110000
-				y = curr & 0x0F; 		//mask: 00001111
-				
-				block[i][j] = Rijndael_Sbox.get(x, y);
-			}
+			subBytes(block[i]);
+		}
+	}
+	
+	private void subBytes(byte[] arr){
+		int x, y;
+		byte curr;
+		for(int j = 0; j < 4; j++){
+			curr = arr[j];
+			
+			x = (curr & 0xF0) >> 4; //mask: 11110000
+			y = curr & 0x0F; 		//mask: 00001111
+			
+			arr[j] = Rijndael_Sbox.get(x, y);
 		}
 	}
 	
@@ -156,6 +206,16 @@ public class RijndaelAES {
 		  //fill col i of block with transform
 			for(int j = 0; j < 4; j++){
 				block[j][i] = r[j];
+			}
+		}
+	}
+	
+	private void addRoundKey(){
+		byte[][] RoundKey = keySchedule.getNextKey();
+		
+		for(int i = 0; i < 4; i++){
+			for(int j = 0; j < 4; j++){
+				block[i][j] ^= RoundKey[i][j];
 			}
 		}
 	}
