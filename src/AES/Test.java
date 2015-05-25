@@ -24,11 +24,7 @@ public class Test {
             System.out.println(new String(data));
             System.out.println("");
             */
-            
-            
-            
-            
-            
+
             /*char[] c = {
                 0x19, 0xa0, 0x9a, 0xe9,
                 0x3d, 0xf4, 0xc6, 0xf8,
@@ -45,6 +41,9 @@ public class Test {
             
             String s = new String(c);
             System.out.println("original");
+            for(int i = 0; i < c.length; i++)
+                System.out.print(c[i]);
+            System.out.println("");
             System.out.println(s);
             System.out.println("");
             byte[] data = new byte[c.length];
@@ -91,6 +90,16 @@ public class Test {
                 
                 RijndaelAES aes2 = new RijndaelAES(data2, privateKey);
                 byte[] bonito = aes2.decrypt(data2, privateKey);
+                index = 0;
+                
+                System.out.println("********888after decrypt");
+                for(int i = 0 ; i < 4; i++){
+                    for(int j = 0 ;j < 4; j++){
+                        System.out.print(toHex(bonito[index++])+" ");
+                    }
+                System.out.println("****************8");
+                }
+                System.out.println("");
                 
                 String fin = new String(bonito);
                 System.out.println("Decrypt");

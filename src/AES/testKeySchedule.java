@@ -29,18 +29,18 @@ public class testKeySchedule {
         }
         KeySchedule keySchedule = new KeySchedule(currentKey);
         
-        printBlock(keySchedule.getKey());
+        printBlock(keySchedule.getFirstKey());
         
-        keySchedule.getNextKey();
-        keySchedule.getNextKey();
-        keySchedule.getNextKey();
-        keySchedule.getNextKey();
-        keySchedule.getNextKey();
-        keySchedule.getNextKey();
-        keySchedule.getNextKey();
-        keySchedule.getNextKey();
-        keySchedule.getNextKey();
-        keySchedule.getNextKey();
+        keySchedule.calculateNextKey();
+        keySchedule.calculateNextKey();
+        keySchedule.calculateNextKey();
+        keySchedule.calculateNextKey();
+        keySchedule.calculateNextKey();
+        keySchedule.calculateNextKey();
+        keySchedule.calculateNextKey();
+        keySchedule.calculateNextKey();
+        keySchedule.calculateNextKey();
+        keySchedule.calculateNextKey();
     }
     
     private static void printBlock(byte[][] block) {

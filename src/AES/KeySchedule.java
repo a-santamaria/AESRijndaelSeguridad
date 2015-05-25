@@ -1,6 +1,8 @@
 package AES;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -10,6 +12,9 @@ public class KeySchedule {
     private byte[][] secretKey;
     private byte[][] currentKey;
     private int round;
+    private int indexRound;
+    private int indexInverseRound;
+    private ArrayList<byte[][]> roundKeys;
     private static char[][] Rcon = {
         {0x01, 0x00, 0x00, 0x00},
         {0x02, 0x00, 0x00, 0x00},
@@ -22,6 +27,7 @@ public class KeySchedule {
         {0x1b, 0x00, 0x00, 0x00},
         {0x36, 0x00, 0x00, 0x00}
     };
+    
 
     public KeySchedule(byte[][] statSecretKey) {
         super();
@@ -44,18 +50,66 @@ public class KeySchedule {
         
         //this.secretKey = this.currentKey = statSecretKey;
         round = 0;
+        indexRound = 0;
+        indexInverseRound = 9;
     }
 
-    public byte[][] getKey() {
-        return secretKey;
+    public byte[][] getFirstKey() {
+        if(roundKeys == null){
+            roundKeys = new ArrayList<>();
+        
+            byte [][] aux = new byte[secretKey.length][];
+            for (int i = 0; i < secretKey.length; i++) {
+                aux[i] = Arrays.copyOf(secretKey[i], secretKey[i].length);
+            }
+            roundKeys.add(aux);
+            for(int i = 0; i < 10; i++){
+                byte [][] next = calculateNextKey();
+                byte [][] aux2 = new byte[next.length][];
+                for (int j = 0; j < next.length; j++) {
+                    aux2[j] = Arrays.copyOf(next[j], next[j].length);
+                }
+                roundKeys.add(aux2);
+            }
+        }
+        return roundKeys.get(0);
     }
     
-    public void setKey(byte[][] key) {
-        secretKey = key;
-        currentKey = key;
+    public byte[][] getNextKey() {
+        if(roundKeys == null || indexRound >= roundKeys.size())
+            return null;
+        return roundKeys.get(++indexRound);
+    }
+    
+    public byte[][] getFirstKeyInverese() {
+         if(roundKeys == null){
+            roundKeys = new ArrayList<>();
+        
+            byte [][] aux = new byte[secretKey.length][];
+            for (int i = 0; i < secretKey.length; i++) {
+                aux[i] = Arrays.copyOf(secretKey[i], secretKey[i].length);
+            }
+            roundKeys.add(aux);
+            for(int i = 0; i < 10; i++){
+                byte [][] next = calculateNextKey();
+                byte [][] aux2 = new byte[next.length][];
+                for (int j = 0; j < next.length; j++) {
+                    aux2[j] = Arrays.copyOf(next[j], next[j].length);
+                }
+                roundKeys.add(aux2);
+            }
+        }
+        
+        return roundKeys.get(roundKeys.size()-1);
+    }
+    
+    public byte[][] getNextKeyInverse() {
+        if(roundKeys == null || indexInverseRound < 0)
+            return null;
+        return roundKeys.get(indexInverseRound--);
     }
 
-    public byte[][] getNextKey() {
+    public byte[][] calculateNextKey() {
         byte[] rotWord = new byte[4];
         for (int i = 0; i < 4; i++) {
             rotWord[i] = currentKey[i][3];

@@ -76,34 +76,33 @@ public class RijndaelAES {
         System.out.println("---------encriptBlock");
         printBlock();
         //addRoundKey with initial key
-        addRoundKey(keySchedule.getKey());
-        System.out.println("addroundkey");
-        printBlock();
+        addRoundKey(keySchedule.getFirstKey());
+        //System.out.println("addroundkey");
+        //printBlock();
         for (int round = 0; round < 9; round++) {
-            System.out.println("round "+ round);
+            //System.out.println("round "+ round);
             subBytes();
-            System.out.println("subBytes");
-            printBlock();
+            //System.out.println("subBytes");
+            //printBlock();
             shiftRows();
-            System.out.println("shiftRows");
-            printBlock();
+            //System.out.println("shiftRows");
+            //printBlock();
             mixColumns();
-            System.out.println("mixcolumns");
-            printBlock();
+            //System.out.println("mixcolumns");
+            //printBlock();
             addRoundKey(keySchedule.getNextKey());
-            System.out.println("addRoundKey");
-            printBlock();
+            //System.out.println("addRoundKey");
+            //printBlock();
         }
-         System.out.println("%%%%%%%%%%%%%%%%%%%%%Sali");
         subBytes();
-          System.out.println("subBytes");
-            printBlock();
+        //System.out.println("subBytes");
+        //printBlock();
         shiftRows();
-        System.out.println("shiftRows");
-            printBlock();
+        //System.out.println("shiftRows");
+        //printBlock();
         addRoundKey(keySchedule.getNextKey());
-         System.out.println("addRoundKey");
-            printBlock();
+        //System.out.println("addRoundKey");
+        //printBlock();
 
         printBlock();
         System.out.println("-------------end EncriptBlock");
@@ -135,18 +134,18 @@ public class RijndaelAES {
         System.out.println("---------decryptBlock");
         printBlock();
         //addRoundKey with initial key
-        addRoundKey(keySchedule.getKey());
+        addRoundKey(keySchedule.getFirstKeyInverese());
 
         for (int round = 0; round < 9; round++) {
             inverseShiftRows();
             inverseSubBytes();
-            addRoundKey(keySchedule.getNextKey()); 
+            addRoundKey(keySchedule.getNextKeyInverse()); 
             inverseMixColumns();           
         }
 
         inverseShiftRows();
         inverseSubBytes();
-        addRoundKey(keySchedule.getNextKey()); 
+        addRoundKey(keySchedule.getNextKeyInverse()); 
 
         printBlock();
         System.out.println("-------------end EncriptBlock");
@@ -372,7 +371,7 @@ public class RijndaelAES {
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 block[i][j] ^= RoundKey[i][j];
-            }
+            }                
         }
     }
 
