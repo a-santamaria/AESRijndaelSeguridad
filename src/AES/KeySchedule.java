@@ -25,7 +25,7 @@ public class KeySchedule {
 
     public KeySchedule(byte[][] statSecretKey) {
         super();
-        /*char[][] testKey = {
+        char[][] testKey = {
             {0x2b, 0x28, 0xab, 0x09},
             {0x7e, 0xae, 0xf7, 0xcf},
             {0x15, 0xd2, 0x15, 0x4f},
@@ -40,9 +40,9 @@ public class KeySchedule {
             }
         }
         secretKey = currentKey;
-        */
         
-        this.secretKey = this.currentKey = statSecretKey;
+        
+        //this.secretKey = this.currentKey = statSecretKey;
         round = 0;
     }
 
@@ -60,13 +60,25 @@ public class KeySchedule {
         for (int i = 0; i < 4; i++) {
             rotWord[i] = currentKey[i][3];
         }
-
+        
+        
         shift(rotWord);
-
+        
+        //System.out.println("-----shift");
+        //printRow(rotWord);
+        
         subBytes(rotWord);
         
+        //System.out.println("-----subBytes");
+        //printRow(rotWord);
+        
         reconXor(rotWord);
-
+        //System.out.println("-----Xor");
+        //printKey();
+        System.out.println("round"+ round);
+        System.out.println("Round key");
+        printKey();
+        round++;
         return currentKey;
     }
 
@@ -92,11 +104,11 @@ public class KeySchedule {
     }
 
     private void reconXor(byte[] arr) {
-
+       
         for (int j = 0; j < 4; j++) {
             currentKey[j][0] = (byte) (currentKey[j][0] ^ arr[j] ^ Rcon[round][j]);
         }
-
+        
         for (int i = 1; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 currentKey[j][i] = (byte) (currentKey[j][i] ^ currentKey[j][i - 1]);
@@ -130,9 +142,11 @@ public class KeySchedule {
     }
 
     private void printRow(byte[] arr) {
+        System.out.println("------------");
         for (int j = 0; j < 4; j++) {
             System.out.print(toHex(arr[j]) + " ");
         }
+        System.out.println("/n---------------");
     }
 
     private void printKey() {

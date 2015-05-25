@@ -77,17 +77,33 @@ public class RijndaelAES {
         printBlock();
         //addRoundKey with initial key
         addRoundKey(keySchedule.getKey());
-
+        System.out.println("addroundkey");
+        printBlock();
         for (int round = 0; round < 9; round++) {
+            System.out.println("round "+ round);
             subBytes();
+            System.out.println("subBytes");
+            printBlock();
             shiftRows();
+            System.out.println("shiftRows");
+            printBlock();
             mixColumns();
+            System.out.println("mixcolumns");
+            printBlock();
             addRoundKey(keySchedule.getNextKey());
+            System.out.println("addRoundKey");
+            printBlock();
         }
-
+         System.out.println("%%%%%%%%%%%%%%%%%%%%%Sali");
         subBytes();
+          System.out.println("subBytes");
+            printBlock();
         shiftRows();
+        System.out.println("shiftRows");
+            printBlock();
         addRoundKey(keySchedule.getNextKey());
+         System.out.println("addRoundKey");
+            printBlock();
 
         printBlock();
         System.out.println("-------------end EncriptBlock");
@@ -122,15 +138,15 @@ public class RijndaelAES {
         addRoundKey(keySchedule.getKey());
 
         for (int round = 0; round < 9; round++) {
-            inverseSubBytes();
             inverseShiftRows();
-            mixColumns();
-            addRoundKey(keySchedule.getNextKey());
+            inverseSubBytes();
+            addRoundKey(keySchedule.getNextKey()); 
+            inverseMixColumns();           
         }
 
-        subBytes();
-        shiftRows();
-        addRoundKey(keySchedule.getNextKey());
+        inverseShiftRows();
+        inverseSubBytes();
+        addRoundKey(keySchedule.getNextKey()); 
 
         printBlock();
         System.out.println("-------------end EncriptBlock");
@@ -273,9 +289,15 @@ public class RijndaelAES {
     /**
      * MixColumns 3rd transformation of Rijndael
      *
-     * The array 'a' is simply a copy of the input array 'r' The array 'b' is
-     * each element of the array 'a' multiplied by 2 in Rijndael's Galois field
-     * a[n] ^ b[n] is element n multiplied by 3 in Rijndael's Galois field 
+     * uses Galois Multiplication lookup tables
+     * for de multiplications
+     * and xor (^) for addition 
+     * 
+     * b_0 = 2a_0 + 3a_1 + 1a_2 + 1a_3
+     * b_1 = 1a_0 + 2a_1 + 3a_2 + 1a_3
+     * b_2 = 1a_0 + 1a_1 + 2a_2 + 3a_3
+     * b_3 = 3a_0 + 1a_1 + 1a_2 + 2a_3
+     * 
      *
      */
     private void mixColumns() {
@@ -294,6 +316,50 @@ public class RijndaelAES {
             r[1] = (byte) (a[0] ^ GMult.getLookUp2(a[1]) ^ GMult.getLookUp3(a[2]) ^ a[3]);
             r[2] = (byte) (a[0] ^ a[1] ^ GMult.getLookUp2(a[2]) ^ GMult.getLookUp3(a[3]));
             r[3] = (byte) (GMult.getLookUp3(a[0]) ^ a[1] ^ a[2] ^ GMult.getLookUp2(a[3]));
+
+            //fill col i of block with transform
+            for (int j = 0; j < 4; j++) {
+                block[j][i] = r[j];
+            }
+        }
+    }
+    
+    
+    /**
+     * InverseMixColumns 3rd transformation of Rijndael
+     * Decrypt
+     *
+     * uses Galois Multiplication lookup tables
+     * for de multiplications
+     * and xor (^) for addition 
+     * 
+     * r_0 = 14a_0 + 11a_1 + 13a_2 +  9a_3
+     * r_1 =  9a_0 + 14a_1 + 11a_2 + 13a_3
+     * r_2 = 13a_0 +  9a_1 + 14a_2 + 11a_3
+     * r_3 = 11a_0 + 13a_1 +  9a_2 + 14a_3
+     * 
+     *
+     */
+    private void inverseMixColumns() {
+        byte[] r = new byte[4];
+        byte[] a = new byte[4];
+        byte[] b = new byte[4];
+        byte c;
+        byte h;
+        for (int i = 0; i < 4; i++) {
+
+            //get col i of block
+            for (int j = 0; j < 4; j++) {
+                a[j] = block[j][i];
+            }
+            r[0] = (byte) (GMult.getLookUp14(a[0]) ^ GMult.getLookUp11(a[1]) ^ 
+                           GMult.getLookUp13(a[2]) ^ GMult.getLookUp9(a[3]));
+            r[1] = (byte) (GMult.getLookUp9(a[0]) ^ GMult.getLookUp14(a[1]) ^ 
+                           GMult.getLookUp11(a[2]) ^ GMult.getLookUp13(a[3]));
+            r[2] = (byte) (GMult.getLookUp13(a[0]) ^ GMult.getLookUp9(a[1]) ^ 
+                           GMult.getLookUp14(a[2]) ^ GMult.getLookUp11(a[3]));
+            r[3] = (byte) (GMult.getLookUp11(a[0]) ^ GMult.getLookUp13(a[1]) ^ 
+                           GMult.getLookUp9(a[2]) ^ GMult.getLookUp14(a[3]));
 
             //fill col i of block with transform
             for (int j = 0; j < 4; j++) {
