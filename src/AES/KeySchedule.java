@@ -88,10 +88,10 @@ public class KeySchedule {
         return roundKeys.get(0);
     }
     
-    public byte[][] getNextKey() {
-        if(roundKeys == null || indexRound >= roundKeys.size())
+    public byte[][] getNextKey(int round) {
+        if(roundKeys == null || round > 10 || round < 0)
             return null;
-        return roundKeys.get(++indexRound);
+        return roundKeys.get(round);
     }
     
     public byte[][] getFirstKeyInverese() {
@@ -116,10 +116,10 @@ public class KeySchedule {
         return roundKeys.get(roundKeys.size()-1);
     }
     
-    public byte[][] getNextKeyInverse() {
-        if(roundKeys == null || indexInverseRound < 0)
+    public byte[][] getNextKeyInverse(int round) {
+        if(roundKeys == null || round > 10 || round < 0)
             return null;
-        return roundKeys.get(indexInverseRound--);
+        return roundKeys.get(10 - round);
     }
 
     public byte[][] calculateNextKey() {

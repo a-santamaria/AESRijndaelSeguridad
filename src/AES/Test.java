@@ -18,36 +18,35 @@ public class Test {
              * cambiar por entreda por gui en vez de archivo*
              */
             //reading data from file as bytes
-            /*Path path = Paths.get("archivo.txt");
+            Path path = Paths.get("archivo.txt");
             byte[] data = Files.readAllBytes(path);
             
             System.out.println("original");
             System.out.println(new String(data));
             System.out.println("");
-            */
 
-            /*char[] c = {
+            /*
+            char[] c = {
                 0x19, 0xa0, 0x9a, 0xe9,
                 0x3d, 0xf4, 0xc6, 0xf8,
                 0xe3, 0xe2, 0x8d, 0x48,
                 0xbe, 0x2b, 0x2a, 0x08
 		};
-            */
-            char[] c = {
+            
+            /*char[] c = {
                 0x32, 0x88, 0x31, 0xe0,
                 0x43, 0x5a, 0x31, 0x37,
                 0xf6, 0x30, 0x98, 0x07,
                 0xa8, 0x8d, 0xa2, 0x34
 		};
-            
+            */
             
             /*char[] c = {
-                'a', 'a', 'a', 'a',
-                'a', 'a', 'a', 'a',
-                'a', 'a', 'a', 'a',
-                'a', 'a', 'a', 'a'
+                '_', '?', 'N', 'R',
+                'a', '%', '3', '2',
+                'g', '~', '{', '.',
+                'f', 'e', '\''
 		};
-            */
             
             String s = new String(c);
             System.out.println("original");
@@ -62,10 +61,12 @@ public class Test {
             for(int i = 0 ; i < c.length; i++){
                 data[i] = (byte) c[i];
             }
+            */
             
             int index = 0;
             for(int i = 0 ; i < 4; i++){
                 for(int j = 0 ;j < 4; j++){
+                    if(index >= data.length) break;
                     System.out.print(toHex(data[index++])+" ");
                 }
                 System.out.println("");

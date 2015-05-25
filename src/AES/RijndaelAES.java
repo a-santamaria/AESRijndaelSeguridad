@@ -70,7 +70,8 @@ public class RijndaelAES {
         addRoundKey(keySchedule.getFirstKey());
         //System.out.println("addroundkey");
         //printBlock();
-        for (int round = 0; round < 9; round++) {
+        int round = 1;
+        for (; round < 10; round++) {
             //System.out.println("round "+ round);
             subBytes();
             //System.out.println("subBytes");
@@ -81,7 +82,7 @@ public class RijndaelAES {
             mixColumns();
             //System.out.println("mixcolumns");
             //printBlock();
-            addRoundKey(keySchedule.getNextKey());
+            addRoundKey(keySchedule.getNextKey(round));
             //System.out.println("addRoundKey");
             //printBlock();
         }
@@ -91,7 +92,7 @@ public class RijndaelAES {
         shiftRows();
         //System.out.println("shiftRows");
         //printBlock();
-        addRoundKey(keySchedule.getNextKey());
+        addRoundKey(keySchedule.getNextKey(round));
         //System.out.println("addRoundKey");
         //printBlock();
 
@@ -131,7 +132,8 @@ public class RijndaelAES {
         addRoundKey(keySchedule.getFirstKeyInverese());
         //System.out.println("addroundkey");
         //printBlock();
-        for (int round = 0; round < 9; round++) {
+        int round = 1;
+        for (; round < 10; round++) {
             //System.out.println("round "+round);
             inverseShiftRows();
             //System.out.println("inverse shift");
@@ -139,7 +141,7 @@ public class RijndaelAES {
             inverseSubBytes();
             //System.out.println("inverese sub bytes");
             //printBlock();
-            addRoundKey(keySchedule.getNextKeyInverse()); 
+            addRoundKey(keySchedule.getNextKeyInverse(round)); 
             //System.out.println("inverse add round key");
             //printBlock();
             inverseMixColumns();    
@@ -153,7 +155,7 @@ public class RijndaelAES {
         inverseSubBytes();
         //System.out.println("inverse sub bytes");
         //printBlock();
-        addRoundKey(keySchedule.getNextKeyInverse());
+        addRoundKey(keySchedule.getNextKeyInverse(round));
         //System.out.println("inverse add round key");
         //printBlock();
 
