@@ -31,6 +31,7 @@ public class KeySchedule {
 
     public KeySchedule(byte[][] statSecretKey) {
         super();
+        /*
         char[][] testKey = {
             {0x2b, 0x28, 0xab, 0x09},
             {0x7e, 0xae, 0xf7, 0xcf},
@@ -47,8 +48,11 @@ public class KeySchedule {
         }
         secretKey = currentKey;
         
-        
-        //this.secretKey = this.currentKey = statSecretKey;
+        */
+        this.secretKey = this.currentKey = statSecretKey;
+        System.out.println("______________Entre con key______________");
+        printKey();
+        System.out.println("____________________________________");
         round = 0;
         indexRound = 0;
         indexInverseRound = 9;
@@ -129,9 +133,9 @@ public class KeySchedule {
         reconXor(rotWord);
         //System.out.println("-----Xor");
         //printKey();
-        System.out.println("round"+ round);
-        System.out.println("Round key");
-        printKey();
+        //System.out.println("round"+ round);
+        //System.out.println("Round key");
+        //printKey();
         round++;
         return currentKey;
     }

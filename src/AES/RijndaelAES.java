@@ -74,7 +74,7 @@ public class RijndaelAES {
 
     private void encryptBlock() {
         System.out.println("---------encriptBlock");
-        printBlock();
+        //printBlock();
         //addRoundKey with initial key
         addRoundKey(keySchedule.getFirstKey());
         //System.out.println("addroundkey");
@@ -110,7 +110,7 @@ public class RijndaelAES {
     }
     
     public byte[] decrypt(byte[] encriptedBytes, byte[][] key) {
-        KeySchedule keySchedule = new KeySchedule(key);
+        keySchedule = new KeySchedule(key);
         byte[] salida = new byte[encriptedBytes.length];
         textbytes = encriptedBytes;
         //thread ??
@@ -132,20 +132,36 @@ public class RijndaelAES {
     
     private void decryptBlock() {
         System.out.println("---------decryptBlock");
-        printBlock();
+        //printBlock();
         //addRoundKey with initial key
         addRoundKey(keySchedule.getFirstKeyInverese());
-
+        //System.out.println("addroundkey");
+        //printBlock();
         for (int round = 0; round < 9; round++) {
+            //System.out.println("round "+round);
             inverseShiftRows();
+            //System.out.println("inverse shift");
+            //printBlock();
             inverseSubBytes();
+            //System.out.println("inverese sub bytes");
+            //printBlock();
             addRoundKey(keySchedule.getNextKeyInverse()); 
-            inverseMixColumns();           
+            //System.out.println("inverse add round key");
+            //printBlock();
+            inverseMixColumns();    
+            //System.out.println("inverse mix cols");
+            //printBlock();
         }
 
         inverseShiftRows();
+        //System.out.println("inverse shift");
+        //printBlock();
         inverseSubBytes();
-        addRoundKey(keySchedule.getNextKeyInverse()); 
+        //System.out.println("inverse sub bytes");
+        //printBlock();
+        addRoundKey(keySchedule.getNextKeyInverse());
+        //System.out.println("inverse add round key");
+        //printBlock();
 
         printBlock();
         System.out.println("-------------end EncriptBlock");
@@ -185,7 +201,6 @@ public class RijndaelAES {
      */
     private void subBytes() {
 
-        byte curr;
         for (int i = 0; i < 4; i++) {
             subBytes(block[i]);
         }
@@ -210,9 +225,8 @@ public class RijndaelAES {
      */
     private void inverseSubBytes() {
 
-        byte curr;
         for (int i = 0; i < 4; i++) {
-            subBytes(block[i]);
+            inverseSubBytes(block[i]);
         }
     }
 
@@ -224,7 +238,6 @@ public class RijndaelAES {
 
             x = (curr & 0xF0) >> 4; //mask: 11110000
             y = curr & 0x0F; 		//mask: 00001111
-
             arr[j] = Rijndael_Sbox.getInverse(x, y);
         }
     }
@@ -300,13 +313,13 @@ public class RijndaelAES {
      *
      */
     private void mixColumns() {
-        byte[] r = new byte[4];
-        byte[] a = new byte[4];
-        byte[] b = new byte[4];
-        byte c;
-        byte h;
+        
         for (int i = 0; i < 4; i++) {
-
+            byte[] r = new byte[4];
+            byte[] a = new byte[4];
+            byte[] b = new byte[4];
+            byte c;
+            byte h;
             //get col i of block
             for (int j = 0; j < 4; j++) {
                 a[j] = block[j][i];
@@ -340,23 +353,26 @@ public class RijndaelAES {
      *
      */
     private void inverseMixColumns() {
-        byte[] r = new byte[4];
-        byte[] a = new byte[4];
-        byte[] b = new byte[4];
-        byte c;
-        byte h;
+        
         for (int i = 0; i < 4; i++) {
-
+            byte[] r = new byte[4];
+            byte[] a = new byte[4];
+            byte[] b = new byte[4];
+            byte c;
+            byte h;
             //get col i of block
             for (int j = 0; j < 4; j++) {
                 a[j] = block[j][i];
             }
             r[0] = (byte) (GMult.getLookUp14(a[0]) ^ GMult.getLookUp11(a[1]) ^ 
                            GMult.getLookUp13(a[2]) ^ GMult.getLookUp9(a[3]));
+            
             r[1] = (byte) (GMult.getLookUp9(a[0]) ^ GMult.getLookUp14(a[1]) ^ 
                            GMult.getLookUp11(a[2]) ^ GMult.getLookUp13(a[3]));
+            
             r[2] = (byte) (GMult.getLookUp13(a[0]) ^ GMult.getLookUp9(a[1]) ^ 
                            GMult.getLookUp14(a[2]) ^ GMult.getLookUp11(a[3]));
+            
             r[3] = (byte) (GMult.getLookUp11(a[0]) ^ GMult.getLookUp13(a[1]) ^ 
                            GMult.getLookUp9(a[2]) ^ GMult.getLookUp14(a[3]));
 

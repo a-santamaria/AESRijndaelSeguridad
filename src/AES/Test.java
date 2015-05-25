@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import javax.swing.SpringLayout;
 
 public class Test {
@@ -38,6 +39,15 @@ public class Test {
                 0xf6, 0x30, 0x98, 0x07,
                 0xa8, 0x8d, 0xa2, 0x34
 		};
+            
+            
+            /*char[] c = {
+                'a', 'a', 'a', 'a',
+                'a', 'a', 'a', 'a',
+                'a', 'a', 'a', 'a',
+                'a', 'a', 'a', 'a'
+		};
+            */
             
             String s = new String(c);
             System.out.println("original");
@@ -88,6 +98,9 @@ public class Test {
                 Path path2 = Paths.get("salida.txt");
                 byte[] data2 = Files.readAllBytes(path2);
                 
+                System.out.println("++++++++++++++++++++Antes de decrypt");
+                pirntKey(privateKey);
+                System.out.println("+++++++++++++++++++++++++++++++++");
                 RijndaelAES aes2 = new RijndaelAES(data2, privateKey);
                 byte[] bonito = aes2.decrypt(data2, privateKey);
                 index = 0;
@@ -101,9 +114,17 @@ public class Test {
                 }
                 System.out.println("");
                 
-                String fin = new String(bonito);
-                System.out.println("Decrypt");
+                String fin = new String(bonito, "UTF-8");
                 System.out.println(fin);
+                /*ArrayList<Character> arr = new ArrayList<>();
+                for(byte b : bonito){
+                    arr.add((char)b);
+                }
+                System.out.println("------------>Decrypted");
+                for(int i = 0; i < arr.size(); i++){
+                    System.out.print(arr.get(i));
+                }
+                System.out.println("------------------->");*/
             } else {
                 System.out.println("empty file");
             }
