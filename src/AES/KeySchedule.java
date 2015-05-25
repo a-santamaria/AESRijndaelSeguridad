@@ -7,14 +7,29 @@ import java.util.Arrays;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
+/**
+ * KeySchedule
+ * planeador de llaves de ronda para algorimto de cirfrado y descifrado
+ * AES Rijndael
+ * @author Alfredo Santamaria
+ * @author Laura Chacon
+ * @author Carlos Manrique
+ */
 public class KeySchedule {
 
+    /** llave privada **/
     private byte[][] secretKey;
+    /** llave privada actual transformada **/
     private byte[][] currentKey;
+    /** numero de ronda **/
     private int round;
+    /** indice de ronda **/
     private int indexRound;
+    /** indice de ronda inversa **/
     private int indexInverseRound;
+    /** lista de las llaves con transformaciones de cada ronda **/
     private ArrayList<byte[][]> roundKeys;
+    /** Rcon lookup **/
     private static char[][] Rcon = {
         {0x01, 0x00, 0x00, 0x00},
         {0x02, 0x00, 0x00, 0x00},
@@ -28,7 +43,11 @@ public class KeySchedule {
         {0x36, 0x00, 0x00, 0x00}
     };
     
-
+    /**
+     * KeySchedule
+     * constructor del planeador de llaves
+     * @param statSecretKey llave privada
+     */
     public KeySchedule(byte[][] statSecretKey) {
         super();
         
@@ -40,16 +59,16 @@ public class KeySchedule {
             this.currentKey[i] = Arrays.copyOf(statSecretKey[i], 
                                             statSecretKey[i].length);
         }
-        //this.secretKey = this.currentKey = statSecretKey;
-        /*System.out.println("______________Entre con key______________");
-        printKey();
-        System.out.println("____________________________________");
-        */
         round = 0;
         indexRound = 0;
         indexInverseRound = 9;
     }
-
+    
+    /**
+     * getFirstKey
+     * retorna la primera llave del planeador
+     * @return llave inicial
+     */
     public byte[][] getFirstKey() {
         if(roundKeys == null){
             roundKeys = new ArrayList<>();
@@ -71,12 +90,23 @@ public class KeySchedule {
         return roundKeys.get(0);
     }
     
+    /**
+     * getNextKey
+     * retorna la siguiente llave con respecto al numero de ronda
+     * @param round numero de ronda
+     * @return siguiente llave de la ronda ronda
+     */
     public byte[][] getNextKey(int round) {
         if(roundKeys == null || round > 10 || round < 0)
             return null;
         return roundKeys.get(round);
     }
     
+    /**
+     * getFirstKeyInverese
+     * retorna la primaera llave inversa
+     * @return primera llave inversa
+     */
     public byte[][] getFirstKeyInverese() {
          if(roundKeys == null){
             roundKeys = new ArrayList<>();
@@ -99,12 +129,23 @@ public class KeySchedule {
         return roundKeys.get(roundKeys.size()-1);
     }
     
+    /**
+     * getNextKeyInverse
+     * retorna la siguiente llave inversa dada la ronda
+     * @param round numero de ronda
+     * @return siguiente llave de la ronda ronda
+     */
     public byte[][] getNextKeyInverse(int round) {
         if(roundKeys == null || round > 10 || round < 0)
             return null;
         return roundKeys.get(10 - round);
     }
 
+    /**
+     * calculateNextKey
+     * hace el calculo de la siguiente llave
+     * @return siguiete llave calculada
+     */
     public byte[][] calculateNextKey() {
         byte[] rotWord = new byte[4];
         for (int i = 0; i < 4; i++) {
@@ -114,24 +155,21 @@ public class KeySchedule {
         
         shift(rotWord);
         
-        //System.out.println("-----shift");
-        //printRow(rotWord);
         
         subBytes(rotWord);
         
-        //System.out.println("-----subBytes");
-        //printRow(rotWord);
         
         reconXor(rotWord);
-        //System.out.println("-----Xor");
-        //printKey();
-        //System.out.println("round"+ round);
-        //System.out.println("Round key");
-        //printKey();
+        
         round++;
         return currentKey;
     }
 
+    /**
+     * shift
+     * transformacion shift
+     * @param arr columna transformada con shift
+     */
     private void shift(byte[] arr) {
         byte aux = arr[0];
         arr[0] = arr[1];
@@ -140,6 +178,11 @@ public class KeySchedule {
         arr[3] = aux;
     }
 
+    /**
+     * subBytes
+     * transformacion subBytes
+     * @param arr coluimna transformada con subBytes
+     */
     private void subBytes(byte[] arr) {
         int x, y;
         byte curr;
@@ -153,6 +196,12 @@ public class KeySchedule {
         }
     }
 
+    /**
+     * reconXor
+     * transformacion reconXor
+     * transforma la llave actual dada la primera
+     * @param arr columna que se usa para la transformacion
+     */
     private void reconXor(byte[] arr) {
        
         for (int j = 0; j < 4; j++) {
@@ -166,6 +215,12 @@ public class KeySchedule {
         }
     }
 
+    /**
+     * generateKey
+     * genera una llave priada con KeyGenerator de la libreria
+     * javax.crypto
+     * @return llave privada
+     */
     public static byte[][] generateKey() {
         KeyGenerator keyGen = null;
         try {
@@ -191,6 +246,11 @@ public class KeySchedule {
         return secretKeyBytes;
     }
 
+    /**
+     * printRow
+     * imprime una fila
+     * @param arr fila a imprimir
+     */
     private void printRow(byte[] arr) {
         System.out.println("------------");
         for (int j = 0; j < 4; j++) {
@@ -199,6 +259,10 @@ public class KeySchedule {
         System.out.println("/n---------------");
     }
 
+    /**
+     * printKey
+     * imprime la llava actual en formato hexadecimal
+     */
     private void printKey() {
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
@@ -207,7 +271,13 @@ public class KeySchedule {
             System.out.println();
         }
     }
-
+    
+    /**
+     * toHex
+     * conversion de byte a formato hexadecimal
+     * @param b byte a convertir
+     * @return string con formato hexadecimal de b
+     */
     private String toHex(byte b) {
         return String.format("0x%02X", (b & 0xFF));
     }

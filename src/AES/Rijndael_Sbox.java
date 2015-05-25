@@ -1,5 +1,13 @@
 package AES;
 
+/**
+ * Rijndael_Sbox
+ * Matrices de substitucion de usada para el algoritmo de cifrado y descifrado  
+ * de AES Rijndael
+ * @author Alfredo Santamaria
+ * @author Laura Chacon
+ * @author Carlos Manrique
+ */
 public class Rijndael_Sbox {
 
     /**
@@ -25,6 +33,9 @@ public class Rijndael_Sbox {
         { 0x8C, 0xA1, 0x89, 0x0D, 0xBF, 0xE6, 0x42, 0x68, 0x41, 0x99, 0x2D, 0x0F, 0xB0, 0x54, 0xBB, 0x16 }
     };
 
+    /**
+     * Rijndael S-box inversa
+     */
     private final static char[][] inverse
     = {
         { 0x52, 0x09, 0x6A, 0xD5, 0x30, 0x36, 0xA5, 0x38, 0xBF, 0x40, 0xA3, 0x9E, 0x81, 0xF3, 0xD7, 0xFB },
@@ -45,11 +56,25 @@ public class Rijndael_Sbox {
         { 0x17, 0x2B, 0x04, 0x7E, 0xBA, 0x77, 0xD6, 0x26, 0xE1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0C, 0x7D }
     };
     
+    /**
+     * get
+     * retorna la posiscion i j de S-box
+     * @param i filas
+     * @param j columnas
+     * @return posiscion i j de S-box
+     */
     public static byte get(int i, int j) {
         return (byte) table[i][j];
 
     }
     
+    /**
+     * getInverse
+     * retorna la posiscion i j de S-box inversa
+     * @param i filas
+     * @param j columnas
+     * @return posiscion i j de S-box inversa
+     */
     public static byte getInverse(int i , int j){
         return (byte) inverse[i][j];
     }

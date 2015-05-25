@@ -5,24 +5,36 @@ import java.security.NoSuchAlgorithmException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
+/**
+ * RijndaelAES
+ * Algoritmos de cifrado y descifrado Advanced Encryption Standard 
+ * Rijndael
+ * @author Alfredo Santamaria
+ * @author Laura Chacon
+ * @author Carlos Manrique
+ */
 public class RijndaelAES {
 
+    /** texto **/
     private static String text;
+    /** bloque de 16 bytes de datos **/
     private static byte[][] block;
+    /** indice **/
     private static int index;
+    /** planeador de llaves **/
     private static KeySchedule keySchedule;
+    /** datos en formato de bytes **/
     private static byte[] textBytes;
 
-    /*public RijndaelAES(byte[] textbytes, byte[][] secretKeybytes) {
-        super();
-
-        this.textbytes = textbytes;
-        this.secretKeyBytes = secretKeybytes;
-        index = 0;
-        block = new byte[4][4];
-        keySchedule = new KeySchedule(secretKeyBytes);
-    }*/
-
+    /**
+     * encrypt
+     * cifra los datos con la llave privada dada por parametro
+     * con el algorithmo AES Rijndael
+     * 
+     * @param textbytes datos a ser cifrados
+     * @param secretKeybytes llave privada de 128 bits
+     * @return arreglo de bytes de los datos encriptados
+     */
     public static byte[] encrypt(byte[] textbytes, byte[][] secretKeybytes) {
         textBytes = textbytes;
         index = 0;
@@ -56,51 +68,42 @@ public class RijndaelAES {
             }
 
         }
-        /*System.out.println("------------------salida");
-         for(byte b : salida){
-         System.out.println(toHex(b));
-         }*/
         return salida;
     }
 
+    /**
+     * encryptBlock
+     * cifra un bloque de 16 bytes
+     */
     private static void encryptBlock() {
         //System.out.println("---------encriptBlock");
         //printBlock();
         //addRoundKey with initial key
         addRoundKey(keySchedule.getFirstKey());
-        //System.out.println("addroundkey");
-        //printBlock();
         int round = 1;
         for (; round < 10; round++) {
             //System.out.println("round "+ round);
             subBytes();
-            //System.out.println("subBytes");
-            //printBlock();
             shiftRows();
-            //System.out.println("shiftRows");
-            //printBlock();
             mixColumns();
-            //System.out.println("mixcolumns");
-            //printBlock();
             addRoundKey(keySchedule.getNextKey(round));
-            //System.out.println("addRoundKey");
-            //printBlock();
         }
         subBytes();
-        //System.out.println("subBytes");
-        //printBlock();
         shiftRows();
-        //System.out.println("shiftRows");
-        //printBlock();
         addRoundKey(keySchedule.getNextKey(round));
-        //System.out.println("addRoundKey");
-        //printBlock();
-
-        //printBlock();
-        //System.out.println("-------------end EncriptBlock");
 
     }
     
+    
+    /**
+     * decrypt
+     * descifra los datos recividos con la llave privada que llega por
+     * parametro 
+     * 
+     * @param encriptedBytes datos a ser descifrados
+     * @param secretKeyBytes llave privada
+     * @return arreglo de bytes con la informacion desifrada
+     */
     public static byte[] decrypt(byte[] encriptedBytes, byte[][] secretKeyBytes) {
         index = 0;
         block = new byte[4][4];
@@ -124,50 +127,36 @@ public class RijndaelAES {
         return salida;
     }
     
-    
+    /**
+     * decryptBlock
+     * descifra un bloque de datos de 16 bytes
+     */
     private static void decryptBlock() {
         //System.out.println("---------decryptBlock");
         //printBlock();
         //addRoundKey with initial key
         addRoundKey(keySchedule.getFirstKeyInverese());
-        //System.out.println("addroundkey");
-        //printBlock();
         int round = 1;
         for (; round < 10; round++) {
             //System.out.println("round "+round);
             inverseShiftRows();
-            //System.out.println("inverse shift");
-            //printBlock();
             inverseSubBytes();
-            //System.out.println("inverese sub bytes");
-            //printBlock();
             addRoundKey(keySchedule.getNextKeyInverse(round)); 
-            //System.out.println("inverse add round key");
-            //printBlock();
-            inverseMixColumns();    
-            //System.out.println("inverse mix cols");
-            //printBlock();
+            inverseMixColumns();   
         }
 
         inverseShiftRows();
-        //System.out.println("inverse shift");
-        //printBlock();
         inverseSubBytes();
-        //System.out.println("inverse sub bytes");
-        //printBlock();
         addRoundKey(keySchedule.getNextKeyInverse(round));
-        //System.out.println("inverse add round key");
-        //printBlock();
-
-        //printBlock();
-        //System.out.println("-------------end EncriptBlock");
 
     }   
     
     
 
     /**
-     * newBlock fills block with next bytes in the byte array
+     * newBlock 
+     * llena el bloque de 16 bytes con el siguietne bloque
+     * de datos
      */
     private static void newBlock() {
         for (int i = 0; i < 4; i++) {
@@ -182,7 +171,9 @@ public class RijndaelAES {
     }
 
     /**
-     * hasNextBlock returns if byte array has bytes left for a new block
+     * hasNextBlock 
+     * verifica si queda un bloque de datos de 16 bits en los datos
+     * @return verdadero si hay un bloque siguiete de lo contrario falso
      */
     private static boolean hasNextBlock() {
         if (index >= textBytes.length) {
@@ -193,7 +184,8 @@ public class RijndaelAES {
     }
 
     /**
-     * subBytes 1st transformation of Rijndael
+     * subBytes 
+     * 1ra transformacion de Rijndael
      */
     private static void subBytes() {
 
@@ -201,7 +193,13 @@ public class RijndaelAES {
             subBytes(block[i]);
         }
     }
-
+    
+    /**
+     * subBytes
+     * sobrecarga de la 1ra transformacion de Rijndael
+     * especifico de una fila del bloque
+     * @param arr fila del bloque
+     */
     private static void subBytes(byte[] arr) {
         int x, y;
         byte curr;
@@ -216,7 +214,8 @@ public class RijndaelAES {
     }
 
     /**
-     * inversesubBytes 1st transformation of Rijndael
+     * inversesubBytes 
+     * 1ra transformacion de Rijndael
      * Decrypt
      */
     private static void inverseSubBytes() {
@@ -226,6 +225,13 @@ public class RijndaelAES {
         }
     }
 
+    /**
+     * inverseSubBytes
+     * Sobrecarga de la 1ra transformacion de Rijndael
+     * especifico de una fila del bloque
+     * Decrypt
+     * @param arr fila del bloque de datos
+     */
     private static void inverseSubBytes(byte[] arr) {
         int x, y;
         byte curr;
@@ -240,7 +246,8 @@ public class RijndaelAES {
     
     
     /**
-     * shiftRows 2nd transformation of Rijndael
+     * shiftRows 
+     * 2da transformacion de Rijndael
      */
     private static void shiftRows() {
         byte aux;
@@ -268,7 +275,8 @@ public class RijndaelAES {
     
     
      /**
-     * InverseShiftRows 2nd transformation of Rijndael
+     * InverseShiftRows
+     * 2da transformacion de Rijndael Rijndael
      * Decrypt
      */
     private static void inverseShiftRows() {
@@ -295,11 +303,12 @@ public class RijndaelAES {
     }
 
     /**
-     * MixColumns 3rd transformation of Rijndael
+     * MixColumns 
+     * 3ra transformacion de Rijndael
      *
-     * uses Galois Multiplication lookup tables
-     * for de multiplications
-     * and xor (^) for addition 
+     * usa tabal lookup de Multiplicacion de  Galois
+     * para las multiplicaciones
+     * y xor (^) para las sumas 
      * 
      * b_0 = 2a_0 + 3a_1 + 1a_2 + 1a_3
      * b_1 = 1a_0 + 2a_1 + 3a_2 + 1a_3
@@ -334,12 +343,13 @@ public class RijndaelAES {
     
     
     /**
-     * InverseMixColumns 3rd transformation of Rijndael
+     * InverseMixColumns 
+     * 3ra transformacion de Rijndael
      * Decrypt
      *
-     * uses Galois Multiplication lookup tables
-     * for de multiplications
-     * and xor (^) for addition 
+     * usa tabal lookup de Multiplicacion de  Galois
+     * para las multiplicaciones
+     * y xor (^) para las sumas  
      * 
      * r_0 = 14a_0 + 11a_1 + 13a_2 +  9a_3
      * r_1 =  9a_0 + 14a_1 + 11a_2 + 13a_3
@@ -379,6 +389,11 @@ public class RijndaelAES {
         }
     }
 
+    /**
+     * 4ta transformacion de Rijndael
+     * 
+     * @param RoundKey llave de ronda
+     */
     private static void addRoundKey(byte[][] RoundKey) {
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
@@ -388,7 +403,8 @@ public class RijndaelAES {
     }
 
     /**
-     * printBlock pirnt block in hex format
+     * printBlock 
+     * imprime bloque en formato hexadecimal
      */
     private static void printBlock() {
         System.out.println("-----------------------");
