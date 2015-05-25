@@ -49,7 +49,16 @@ public class KeySchedule {
         secretKey = currentKey;
         
         */
-        this.secretKey = this.currentKey = statSecretKey;
+        
+        this.secretKey = new byte[statSecretKey.length][];
+        this.currentKey = new byte[statSecretKey.length][];
+        for (int i = 0; i < statSecretKey.length; i++) {
+            this.secretKey[i] = Arrays.copyOf(statSecretKey[i], 
+                                            statSecretKey[i].length);
+            this.currentKey[i] = Arrays.copyOf(statSecretKey[i], 
+                                            statSecretKey[i].length);
+        }
+        //this.secretKey = this.currentKey = statSecretKey;
         System.out.println("______________Entre con key______________");
         printKey();
         System.out.println("____________________________________");

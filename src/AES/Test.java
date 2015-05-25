@@ -84,8 +84,8 @@ public class Test {
             pirntKey(privateKey);
 
             //aes encription algorithm
-            RijndaelAES aes = new RijndaelAES(data, privateKey);
-            byte[] salida = aes.encrypt();
+            //RijndaelAES aes = new RijndaelAES(data, privateKey);
+            byte[] salida = RijndaelAES.encrypt(data, privateKey);
 
             if (salida != null) {
                 //saving encrypted bytes to file
@@ -101,8 +101,8 @@ public class Test {
                 System.out.println("++++++++++++++++++++Antes de decrypt");
                 pirntKey(privateKey);
                 System.out.println("+++++++++++++++++++++++++++++++++");
-                RijndaelAES aes2 = new RijndaelAES(data2, privateKey);
-                byte[] bonito = aes2.decrypt(data2, privateKey);
+                //RijndaelAES aes2 = new RijndaelAES(data2, privateKey);
+                byte[] bonito = RijndaelAES.decrypt(data2, privateKey);
                 index = 0;
                 
                 System.out.println("********888after decrypt");

@@ -7,15 +7,13 @@ import javax.crypto.SecretKey;
 
 public class RijndaelAES {
 
-    private String text;
-    private byte[][] block;
-    private int index;
-    private SecretKey secretKey;
-    private byte[][] secretKeyBytes;
-    private KeySchedule keySchedule;
-    byte[] textbytes;
+    private static String text;
+    private static byte[][] block;
+    private static int index;
+    private static KeySchedule keySchedule;
+    private static byte[] textBytes;
 
-    public RijndaelAES(byte[] textbytes, byte[][] secretKeybytes) {
+    /*public RijndaelAES(byte[] textbytes, byte[][] secretKeybytes) {
         super();
 
         this.textbytes = textbytes;
@@ -23,21 +21,14 @@ public class RijndaelAES {
         index = 0;
         block = new byte[4][4];
         keySchedule = new KeySchedule(secretKeyBytes);
-    }
+    }*/
 
-    private void generateKey() {
-        KeyGenerator keyGen = null;
-        try {
-            keyGen = KeyGenerator.getInstance("AES");
-        } catch (NoSuchAlgorithmException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        keyGen.init(128);
-        secretKey = keyGen.generateKey();
-    }
-
-    public byte[] encrypt() {
+    public static byte[] encrypt(byte[] textbytes, byte[][] secretKeybytes) {
+        textBytes = textbytes;
+        index = 0;
+        block = new byte[4][4];
+        keySchedule = new KeySchedule(secretKeybytes);
+        
         index = 0;
         if (textbytes.length == 0) {
             return null;
@@ -72,7 +63,7 @@ public class RijndaelAES {
         return salida;
     }
 
-    private void encryptBlock() {
+    private static void encryptBlock() {
         System.out.println("---------encriptBlock");
         //printBlock();
         //addRoundKey with initial key
@@ -109,10 +100,13 @@ public class RijndaelAES {
 
     }
     
-    public byte[] decrypt(byte[] encriptedBytes, byte[][] key) {
-        keySchedule = new KeySchedule(key);
+    public static byte[] decrypt(byte[] encriptedBytes, byte[][] secretKeyBytes) {
+        index = 0;
+        block = new byte[4][4];
+        keySchedule = new KeySchedule(secretKeyBytes);
+        
         byte[] salida = new byte[encriptedBytes.length];
-        textbytes = encriptedBytes;
+        textBytes = encriptedBytes;
         //thread ??
         int index = 0;
         while (hasNextBlock()) {
@@ -130,7 +124,7 @@ public class RijndaelAES {
     }
     
     
-    private void decryptBlock() {
+    private static void decryptBlock() {
         System.out.println("---------decryptBlock");
         //printBlock();
         //addRoundKey with initial key
@@ -173,11 +167,11 @@ public class RijndaelAES {
     /**
      * newBlock fills block with next bytes in the byte array
      */
-    private void newBlock() {
+    private static void newBlock() {
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-                if (index < textbytes.length) {
-                    block[i][j] = (textbytes[index++]);
+                if (index < textBytes.length) {
+                    block[i][j] = (textBytes[index++]);
                 } else {
                     block[i][j] = 0;
                 }
@@ -188,8 +182,8 @@ public class RijndaelAES {
     /**
      * hasNextBlock returns if byte array has bytes left for a new block
      */
-    private boolean hasNextBlock() {
-        if (index >= textbytes.length) {
+    private static boolean hasNextBlock() {
+        if (index >= textBytes.length) {
             return false;
         } else {
             return true;
@@ -199,14 +193,14 @@ public class RijndaelAES {
     /**
      * subBytes 1st transformation of Rijndael
      */
-    private void subBytes() {
+    private static void subBytes() {
 
         for (int i = 0; i < 4; i++) {
             subBytes(block[i]);
         }
     }
 
-    private void subBytes(byte[] arr) {
+    private static void subBytes(byte[] arr) {
         int x, y;
         byte curr;
         for (int j = 0; j < 4; j++) {
@@ -223,14 +217,14 @@ public class RijndaelAES {
      * inversesubBytes 1st transformation of Rijndael
      * Decrypt
      */
-    private void inverseSubBytes() {
+    private static void inverseSubBytes() {
 
         for (int i = 0; i < 4; i++) {
             inverseSubBytes(block[i]);
         }
     }
 
-    private void inverseSubBytes(byte[] arr) {
+    private static void inverseSubBytes(byte[] arr) {
         int x, y;
         byte curr;
         for (int j = 0; j < 4; j++) {
@@ -246,7 +240,7 @@ public class RijndaelAES {
     /**
      * shiftRows 2nd transformation of Rijndael
      */
-    private void shiftRows() {
+    private static void shiftRows() {
         byte aux;
 
         aux = block[1][0];
@@ -275,7 +269,7 @@ public class RijndaelAES {
      * InverseShiftRows 2nd transformation of Rijndael
      * Decrypt
      */
-    private void inverseShiftRows() {
+    private static void inverseShiftRows() {
         byte aux;
 
         aux = block[1][3];
@@ -312,7 +306,7 @@ public class RijndaelAES {
      * 
      *
      */
-    private void mixColumns() {
+    private static void mixColumns() {
         
         for (int i = 0; i < 4; i++) {
             byte[] r = new byte[4];
@@ -352,7 +346,7 @@ public class RijndaelAES {
      * 
      *
      */
-    private void inverseMixColumns() {
+    private static void inverseMixColumns() {
         
         for (int i = 0; i < 4; i++) {
             byte[] r = new byte[4];
@@ -383,7 +377,7 @@ public class RijndaelAES {
         }
     }
 
-    private void addRoundKey(byte[][] RoundKey) {
+    private static void addRoundKey(byte[][] RoundKey) {
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 block[i][j] ^= RoundKey[i][j];
@@ -394,7 +388,7 @@ public class RijndaelAES {
     /**
      * printBlock pirnt block in hex format
      */
-    private void printBlock() {
+    private static void printBlock() {
         System.out.println("-----------------------");
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
@@ -405,15 +399,15 @@ public class RijndaelAES {
         System.out.println("-----------------------");
     }
 
-    private String toHex(char c) {
+    private static String toHex(char c) {
         return String.format("0x%02X", (int) c);
     }
 
-    private String toHex(int x) {
+    private static String toHex(int x) {
         return String.format("0x%02X", x);
     }
 
-    private String toHex(byte b) {
+    private static String toHex(byte b) {
         return String.format("0x%02X", (b & 0xFF));
     }
 }
