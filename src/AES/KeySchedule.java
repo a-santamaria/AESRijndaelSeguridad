@@ -31,24 +31,6 @@ public class KeySchedule {
 
     public KeySchedule(byte[][] statSecretKey) {
         super();
-        /*
-        char[][] testKey = {
-            {0x2b, 0x28, 0xab, 0x09},
-            {0x7e, 0xae, 0xf7, 0xcf},
-            {0x15, 0xd2, 0x15, 0x4f},
-            {0x16, 0xa6, 0x88, 0x3c}
-        };
-        
-
-        this.currentKey = new byte[4][4];
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                currentKey[i][j] = (byte) testKey[i][j];
-            }
-        }
-        secretKey = currentKey;
-        
-        */
         
         this.secretKey = new byte[statSecretKey.length][];
         this.currentKey = new byte[statSecretKey.length][];
@@ -59,9 +41,10 @@ public class KeySchedule {
                                             statSecretKey[i].length);
         }
         //this.secretKey = this.currentKey = statSecretKey;
-        System.out.println("______________Entre con key______________");
+        /*System.out.println("______________Entre con key______________");
         printKey();
         System.out.println("____________________________________");
+        */
         round = 0;
         indexRound = 0;
         indexInverseRound = 9;

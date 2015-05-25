@@ -64,7 +64,7 @@ public class RijndaelAES {
     }
 
     private static void encryptBlock() {
-        System.out.println("---------encriptBlock");
+        //System.out.println("---------encriptBlock");
         //printBlock();
         //addRoundKey with initial key
         addRoundKey(keySchedule.getFirstKey());
@@ -96,8 +96,8 @@ public class RijndaelAES {
         //System.out.println("addRoundKey");
         //printBlock();
 
-        printBlock();
-        System.out.println("-------------end EncriptBlock");
+        //printBlock();
+        //System.out.println("-------------end EncriptBlock");
 
     }
     
@@ -126,7 +126,7 @@ public class RijndaelAES {
     
     
     private static void decryptBlock() {
-        System.out.println("---------decryptBlock");
+        //System.out.println("---------decryptBlock");
         //printBlock();
         //addRoundKey with initial key
         addRoundKey(keySchedule.getFirstKeyInverese());
@@ -159,8 +159,8 @@ public class RijndaelAES {
         //System.out.println("inverse add round key");
         //printBlock();
 
-        printBlock();
-        System.out.println("-------------end EncriptBlock");
+        //printBlock();
+        //System.out.println("-------------end EncriptBlock");
 
     }   
     
